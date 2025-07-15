@@ -39,6 +39,10 @@
     <div class="text-center mb-4">
       <h2 style="color: #0B59A4;">QR Attendance System</h2>
       <p class="lead">Choose your attendance method</p>
+      <div class="btn-group" role="group" aria-label="Check In/Out">
+        <button class="btn btn-primary" onclick="setMode('checkin')"><i class="bi bi-box-arrow-in-right"></i> Check In</button>
+        <button class="btn btn-outline-primary" onclick="setMode('checkout')"><i class="bi bi-box-arrow-left"></i> Check Out</button>
+      </div>
     </div>
 
     <div class="row g-4 justify-content-center">
@@ -48,7 +52,7 @@
             <i class="bi bi-qr-code-scan"></i>
             <h5 class="card-title">Scan QR Code</h5>
             <p class="card-text">Use your camera to scan your staff QR code.</p>
-            <button class="btn btn-outline-primary btn-sm"> Start Scanner</button>
+            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-camera-video"></i> Start Scanner</button>
           </div>
         </div>
       </div>
@@ -59,7 +63,7 @@
             <i class="bi bi-keyboard"></i>
             <h5 class="card-title">Enter Staff Number</h5>
             <p class="card-text">Type your staff number to log attendance manually.</p>
-            <button class="btn btn-outline-primary btn-sm"> Enter Number</button>
+            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-person-check"></i> Enter Number</button>
           </div>
         </div>
       </div>
@@ -87,6 +91,15 @@
 
   <script>
     let qrScanner = null;
+    let currentMode = 'checkin'; // default mode
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll(".btn-group .btn").forEach(btn => btn.classList.remove('btn-primary'));
+      document.querySelectorAll(".btn-group .btn").forEach(btn => btn.classList.add('btn-outline-primary'));
+      document.querySelector(`.btn-group .btn[onclick="setMode('${mode}')"]`).classList.remove('btn-outline-primary');
+      document.querySelector(`.btn-group .btn[onclick="setMode('${mode}')"]`).classList.add('btn-primary');
+    }
 
     function showMethod(method) {
       document.getElementById('qr-section').classList.add('hidden');
@@ -123,7 +136,7 @@
       fetch('api/attendance.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'manual', staff_no: staffNo })
+        body: JSON.stringify({ mode: 'manual', staff_no: staffNo, action: currentMode })
       })
       .then(res => res.json())
       .then(data => logResult(data.message, data.status === "success"));
@@ -133,7 +146,7 @@
       fetch('api/attendance.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'qr', code: decodedText })
+        body: JSON.stringify({ mode: 'qr', code: decodedText, action: currentMode })
       })
       .then(res => res.json())
       .then(data => logResult(data.message, data.status === "success"));
