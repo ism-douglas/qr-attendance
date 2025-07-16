@@ -130,6 +130,7 @@
       res.style.color = success ? "green" : "red";
     }
 
+  
     function submitFallback(e) {
       e.preventDefault();
       const staffNo = document.getElementById("staff_no").value;
@@ -139,8 +140,16 @@
         body: JSON.stringify({ mode: 'manual', staff_no: staffNo, action: currentMode })
       })
       .then(res => res.json())
-      .then(data => logResult(data.message, data.status === "success"));
+      .then(data => {
+        logResult(data.message, data.status === "success");
+
+        // ✅ Clear input field on success
+        if (data.status === "success") {
+          document.getElementById("staff_no").value = "";
+        }
+      });
     }
+
 
     function onScanSuccess(decodedText) {
       fetch('api/attendance.php', {
