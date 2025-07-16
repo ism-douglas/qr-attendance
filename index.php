@@ -150,7 +150,6 @@
       });
     }
 
-
     function onScanSuccess(decodedText) {
       fetch('api/attendance.php', {
         method: 'POST',
@@ -158,8 +157,19 @@
         body: JSON.stringify({ mode: 'qr', code: decodedText, action: currentMode })
       })
       .then(res => res.json())
-      .then(data => logResult(data.message, data.status === "success"));
+      .then(data => {
+        logResult(data.message, data.status === "success");
+
+        if (data.status === "success") {
+          // ✅ Optional: delay briefly before reload
+          setTimeout(() => {
+            location.reload();
+          }, 1500); // Wait 1.5 seconds before reload to show message
+        }
+      });
     }
+
+
   </script>
 </body>
 </html>
